@@ -105,27 +105,13 @@
             let receiptFile = document.getElementById("receipt").files[0];
             
             if (receiptFile) {
-                let imageFormData = new FormData();
-                imageFormData.append("image", receiptFile);
-                
-                let imageResponse = await fetch("https://script.google.com/macros/s/AKfycbzi0k4Nn-5auQNqcg1iLwzCWspjzW0ntKvc_-MVlZsZhnUu-biYOTBfOQ10gi32jf-a/exec", {
-                    method: "POST",
-                    body: imageFormData
-                });
-
-                let imageResult = await imageResponse.json();
-                if (imageResult.status === "Success") {
-                    formData.append("imageUrl", imageResult.imageUrl);
-                } else {
-                    alert("Error uploading receipt.");
-                    return;
-                }
-            } else {
-                formData.append("imageUrl", "No Receipt Provided");
+                formData.append("receipt", receiptFile);
             }
 
+            // Use no-cors mode to bypass CORS restrictions (note that you won’t get a response back)
             fetch("https://script.google.com/macros/s/AKfycbzi0k4Nn-5auQNqcg1iLwzCWspjzW0ntKvc_-MVlZsZhnUu-biYOTBfOQ10gi32jf-a/exec", {
                 method: "POST",
+                mode: "no-cors",
                 body: formData
             })
             .then(() => alert("Cost report submitted successfully!"))
