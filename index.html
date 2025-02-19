@@ -61,11 +61,9 @@
     <h2>Daily Costing Report</h2>
     
     <form id="costingForm">
-        <!-- Staff Name -->
         <label for="staffName">Staff Name (Required)</label>
         <input type="text" id="staffName" placeholder="Enter your name" required>
 
-        <!-- Cost Category -->
         <label for="costCategory">Cost Category (Required)</label>
         <select id="costCategory" required>
             <option value="" disabled selected>Select Category</option>
@@ -76,19 +74,15 @@
             <option value="Miscellaneous">Miscellaneous</option>
         </select>
 
-        <!-- Amount Spent -->
         <label for="amount">Amount Spent (Required)</label>
         <input type="number" id="amount" placeholder="Enter amount" required>
 
-        <!-- Description -->
         <label for="description">Description (Optional)</label>
         <textarea id="description" placeholder="Enter details (if any)..."></textarea>
 
-        <!-- Upload Receipt -->
         <label for="receipt">Upload Receipt (Optional)</label>
         <input type="file" id="receipt" accept="image/*">
 
-        <!-- Submit Button -->
         <button type="submit">Submit Cost Report</button>
     </form>
 
@@ -107,12 +101,19 @@
                 formData.append("receipt", receiptFile);
             }
             
-            fetch("https://script.google.com/macros/s/AKfycbzsqIGKSv47sKoJ8iweZ3U6Nojk9odJJ0-dRGO0BNy2ugYoyekYxWWbY3bc00QwR_jl/exec", {
+            fetch("https://script.google.com/macros/s/AKfycbzbAcWntCMR2CYtpUWSiP2LYxE5yB7bIAMzwoHvDAuGwWW-sR6zLAYTdi0GW1kd2_yJ/exec", {
                 method: "POST",
                 body: formData
             })
-            .then(() => alert("Cost report submitted successfully!"))
-            .catch(error => alert("Error: " + error));
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "Success") {
+                    alert("Cost report submitted successfully!\nReceipt URL: " + data.receiptUrl);
+                } else {
+                    alert("Error: " + data.message);
+                }
+            })
+            .catch(error => alert("Error: " + error.message));
         });
     </script>
 
