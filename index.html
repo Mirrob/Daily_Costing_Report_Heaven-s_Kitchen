@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Costing Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        h2 {
+            text-align: center;
+            font-weight: bold;
+            color: #4a90e2;
+            margin-bottom: 20px;
+        }
+        form {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+        select, input, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4a90e2;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background-color: #357ab9;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Daily Costing Report</h2>
+    
+    <form id="costingForm">
+        <!-- Staff Name -->
+        <label for="staffName">Staff Name (Required)</label>
+        <input type="text" id="staffName" placeholder="Enter your name" required>
+
+        <!-- Cost Category -->
+        <label for="costCategory">Cost Category (Required)</label>
+        <select id="costCategory" required>
+            <option value="" disabled selected>Select Category</option>
+            <option value="Ingredients">Ingredients</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Staff Expenses">Staff Expenses</option>
+            <option value="Electricity/Utilities">Electricity/Utilities</option>
+            <option value="Miscellaneous">Miscellaneous</option>
+        </select>
+
+        <!-- Amount Spent -->
+        <label for="amount">Amount Spent (Required)</label>
+        <input type="number" id="amount" placeholder="Enter amount" required>
+
+        <!-- Description -->
+        <label for="description">Description (Optional)</label>
+        <textarea id="description" placeholder="Enter details (if any)..."></textarea>
+
+        <!-- Upload Receipt -->
+        <label for="receipt">Upload Receipt (Optional)</label>
+        <input type="file" id="receipt" accept="image/*">
+
+        <!-- Submit Button -->
+        <button type="submit">Submit Cost Report</button>
+    </form>
+
+    <script>
+        document.getElementById("costingForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            
+            let formData = new FormData();
+            formData.append("staffName", document.getElementById("staffName").value);
+            formData.append("costCategory", document.getElementById("costCategory").value);
+            formData.append("amount", document.getElementById("amount").value);
+            formData.append("description", document.getElementById("description").value || "No Description");
+
+            let receiptFile = document.getElementById("receipt").files[0];
+            
+            if (receiptFile) {
+                let imageFormData = new FormData();
+                imageFormData.append("image", receiptFile);
+                
+                let imageResponse = await fetch("https://script.google.com/macros/s/AKfycbzi0k4Nn-5auQNqcg1iLwzCWspjzW0ntKvc_-MVlZsZhnUu-biYOTBfOQ10gi32jf-a/exec", {
+                    method: "POST",
+                    body: imageFormData
+                });
+
+                let imageResult = await imageResponse.json();
+                if (imageResult.status === "Success") {
+                    formData.append("imageUrl", imageResult.imageUrl);
+                } else {
+                    alert("Error uploading receipt.");
+                    return;
+                }
+            } else {
+                formData.append("imageUrl", "No Receipt Provided");
+            }
+
+            fetch("https://script.google.com/macros/s/AKfycbzi0k4Nn-5auQNqcg1iLwzCWspjzW0ntKvc_-MVlZsZhnUu-biYOTBfOQ10gi32jf-a/exec", {
+                method: "POST",
+                body: formData
+            })
+            .then(() => alert("Cost report submitted successfully!"))
+            .catch(error => alert("Error: " + error));
+        });
+    </script>
+
+</body>
+</html>
