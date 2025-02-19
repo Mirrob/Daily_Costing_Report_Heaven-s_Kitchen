@@ -84,6 +84,10 @@
         <label for="description">Description (Optional)</label>
         <textarea id="description" placeholder="Enter details (if any)..."></textarea>
 
+        <!-- Upload Receipt -->
+        <label for="receipt">Upload Receipt (Optional)</label>
+        <input type="file" id="receipt" accept="image/*">
+
         <!-- Submit Button -->
         <button type="submit">Submit Cost Report</button>
     </form>
@@ -92,19 +96,20 @@
         document.getElementById("costingForm").addEventListener("submit", async function(event) {
             event.preventDefault();
             
-            let formData = {
-                staffName: document.getElementById("staffName").value,
-                costCategory: document.getElementById("costCategory").value,
-                amount: document.getElementById("amount").value,
-                description: document.getElementById("description").value || "No Description"
-            };
-
+            let formData = new FormData();
+            formData.append("staffName", document.getElementById("staffName").value);
+            formData.append("costCategory", document.getElementById("costCategory").value);
+            formData.append("amount", document.getElementById("amount").value);
+            formData.append("description", document.getElementById("description").value || "No Description");
+            
+            let receiptFile = document.getElementById("receipt").files[0];
+            if (receiptFile) {
+                formData.append("receipt", receiptFile);
+            }
+            
             fetch("https://script.google.com/macros/s/AKfycbzsqIGKSv47sKoJ8iweZ3U6Nojk9odJJ0-dRGO0BNy2ugYoyekYxWWbY3bc00QwR_jl/exec", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(formData)
+                body: formData
             })
             .then(() => alert("Cost report submitted successfully!"))
             .catch(error => alert("Error: " + error));
